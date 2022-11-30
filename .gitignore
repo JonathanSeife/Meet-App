@@ -1,6 +1,8 @@
 # dependencies
+node_modules/
+.node_modules/
 /node_modules
-node_modules
+./node_modules
 /.pnp
 .pnp.js
 
@@ -25,6 +27,4 @@ yarn-error.log*
 # serverless
 .serverless
 node_modules
-node_modules
-node_modules
-node_modules
+
