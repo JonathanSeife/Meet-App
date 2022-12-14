@@ -10,6 +10,8 @@ class App extends Component {
   state = {
     events: [],
     locations: [],
+    numberOfEvents: 32,
+    selectedLocation: "all",
   };
 
   updateEvents = (location, eventCount) => {
@@ -47,6 +49,12 @@ class App extends Component {
         <CitySearch
           locations={this.state.locations}
           updateEvents={this.updateEvents}
+        />
+        <NumberOfEvents
+          numEvents={this.state.numberOfEvents}
+          updateNumberOfEvents={(numEvents) =>
+            this.updateNumberOfEvents(numEvents)
+          }
         />
         <EventList events={this.state.events} />
       </div>
