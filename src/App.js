@@ -16,13 +16,13 @@ class App extends Component {
 
   updateEvents = (location, eventCount) => {
     const { numberOfEvents } = this.state;
-    if (location === undefined) location = this.state.selectedLocation;
+    if (location === null) location = this.state.selectedLocation;
     getEvents().then((events) => {
       const locationEvents =
         location === "all"
           ? events
           : events.filter((event) => event.location === location);
-      eventCount = eventCount === undefined ? numberOfEvents : eventCount;
+      eventCount = eventCount === null ? numberOfEvents : eventCount;
       this.setState({
         events: locationEvents.slice(0, eventCount),
         selectedLocation: location,
@@ -43,6 +43,11 @@ class App extends Component {
   componentWillUnmount() {
     this.mounted = false;
   }
+
+  updateNumberOfEvents = (numberOfEvents) => {
+    this.setState({ numberOfEvents }, this.updateEvents(null, numberOfEvents));
+  };
+
   render() {
     return (
       <div className="App">
@@ -50,12 +55,7 @@ class App extends Component {
           locations={this.state.locations}
           updateEvents={this.updateEvents}
         />
-        <NumberOfEvents
-          numEvents={this.state.numberOfEvents}
-          updateNumberOfEvents={(numEvents) =>
-            this.updateNumberOfEvents(numEvents)
-          }
-        />
+        <NumberOfEvents updateNumberOfEvents={this.updateNumberOfEvents} />
         <EventList events={this.state.events} />
       </div>
     );

@@ -5,8 +5,9 @@ export class NumberOfEvents extends Component {
     numEvents: 32,
   };
 
-  changeNum = (value) => {
-    this.setState({ num: value });
+  handleInputChanged = (event) => {
+    const value = event.target.value;
+    this.setState({ numEvents: value });
     this.props.updateNumberOfEvents(value);
   };
 
