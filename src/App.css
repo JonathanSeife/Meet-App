@@ -47,6 +47,7 @@ input[type="number"] {
   max-width: 300px;
   margin: auto;
   position: relative;
+  justify-content: flex-end;
 }
 
 .suggestions {
@@ -129,8 +130,9 @@ input[type="number"] {
 }
 
 .Alert {
-  position: fixed;
-  top: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 .data-vis-wrapper {
