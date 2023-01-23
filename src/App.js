@@ -17,16 +17,33 @@ class App extends Component {
     showWelcomeScreen: undefined,
   };
 
-  updateEvents = (location, eventCount) => {
-    getEvents().then((events) => {
-      const locationEvents =
-        location === "all"
-          ? events
-          : events.filter((event) => event.location === location);
-      this.setState({
-        events: locationEvents.slice(0, this.state.numberOfEvents),
+  updateEvents = (location, inputs) => {
+    const { eventCount, seletedLocation } = this.state;
+    if (location) {
+      getEvents().then((events) => {
+        const locationEvents =
+          location === "all"
+            ? events
+            : events.filter((event) => event.location === location);
+        const eventsToShow = locationEvents.slice(0, eventCount);
+        this.setState({
+          events: eventsToShow,
+          seletedLocation: location,
+        });
       });
-    });
+    } else {
+      getEvents().then((events) => {
+        const locationEvents =
+          seletedLocation === "all"
+            ? events
+            : events.filter((event) => event.location === seletedLocation);
+        const eventsToShow = locationEvents.slice(0, inputs);
+        this.setState({
+          events: eventsToShow,
+          eventCount: inputs,
+        });
+      });
+    }
   };
 
   updateNumberOfEvents(number) {
