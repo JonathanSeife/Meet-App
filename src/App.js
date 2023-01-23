@@ -19,16 +19,13 @@ class App extends Component {
 
   async componentDidMount() {
     this.mounted = true;
-
     const accessToken = localStorage.getItem("access_token");
     const isTokenValid = (await checkToken(accessToken)).error ? false : true;
     const searchParams = new URLSearchParams(window.location.search);
+
     const code = searchParams.get("code");
-    const isLocal = window.location.href.startsWith("http://localhost")
-      ? true
-      : code || isTokenValid;
-    this.setState({ showWelcomeScreen: !isLocal });
-    if (isLocal && this.mounted) {
+    this.setState({ showWelcomeScreen: !(code || isTokenValid) });
+    if ((code || isTokenValid) && this.mounted) {
       getEvents().then((events) => {
         if (this.mounted) {
           this.setState({ events, locations: extractLocations(events) });
@@ -36,6 +33,7 @@ class App extends Component {
       });
     }
   }
+
   componentWillUnmount() {
     this.mounted = false;
   }
