@@ -49,10 +49,8 @@ class App extends Component {
       if ((code || isTokenValid) && this.mounted)
         getEvents().then((events) => {
           if (this.mounted) {
-            this.setState({
-              events: events.slice(0, this.state.numberOfEvents),
-              locations: extractLocations(events),
-            });
+            events = events.slice(0, this.state.eventCount);
+            this.setState({ events, locations: extractLocations(events) });
           }
         });
     } else {
