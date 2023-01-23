@@ -17,12 +17,6 @@ class App extends Component {
     showWelcomeScreen: undefined,
   };
 
-  updateNumberOfEvents(number) {
-    this.setState({
-      numberOfEvents: number,
-    });
-  }
-
   async componentDidMount() {
     this.mounted = true;
     const accessToken = localStorage.getItem("access_token");

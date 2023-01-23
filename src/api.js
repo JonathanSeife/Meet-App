@@ -43,12 +43,7 @@ const removeQuery = () => {
 
 export const getEvents = async () => {
   NProgress.start();
-
-  const isLocal =
-    window.location.href.startsWith("http://127.0.0.1") ||
-    window.location.href.startsWith("http://localhost");
-
-  if (isLocal) {
+  if (window.location.href.startsWith("http://localhost")) {
     NProgress.done();
     return mockData;
   }
@@ -58,7 +53,6 @@ export const getEvents = async () => {
     NProgress.done();
     return data ? JSON.parse(data).events : [];
   }
-
   const token = await getAccessToken();
 
   if (token) {
