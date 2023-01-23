@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { ErrorAlert } from "./Alert";
 
-export class NumberOfEvents extends Component {
+class NumberOfEvents extends Component {
   state = {
     numEvents: 32,
     errorText: "",
