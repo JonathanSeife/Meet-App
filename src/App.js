@@ -12,30 +12,25 @@ class App extends Component {
   state = {
     events: [],
     locations: [],
-    eventCount: 32,
+    numberOfEvents: 32,
     selectedLocation: "all",
     showWelcomeScreen: undefined,
   };
 
   async componentDidMount() {
     this.mounted = true;
-    const accessToken = localStorage.getItem("access_token");
-    let goGetEvents;
-    if (navigator.onLine) {
-      const isTokenValid = (await checkToken(accessToken)).error ? false : true;
-      const searchParams = new URLSearchParams(window.location.search);
-      const code = searchParams.get("code");
-      this.setState({ showWelcomeScreen: !(code || isTokenValid) });
-      goGetEvents = (code || isTokenValid) && this.mounted;
-    } else {
-      goGetEvents = accessToken && this.mounted;
-      this.setState({ showWelcomeScreen: false });
-    }
 
-    if (goGetEvents) {
+    const accessToken = localStorage.getItem("access_token");
+    const isTokenValid = (await checkToken(accessToken)).error ? false : true;
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
+    const isLocal = window.location.href.startsWith("http://localhost")
+      ? true
+      : code || isTokenValid;
+    this.setState({ showWelcomeScreen: !isLocal });
+    if (isLocal && this.mounted) {
       getEvents().then((events) => {
         if (this.mounted) {
-          events = events.slice(0, this.state.eventCount);
           this.setState({ events, locations: extractLocations(events) });
         }
       });
@@ -45,33 +40,21 @@ class App extends Component {
     this.mounted = false;
   }
 
-  updateEvents = (location, inputs) => {
-    const { eventCount, seletedLocation } = this.state;
-    if (location) {
-      getEvents().then((events) => {
-        const locationEvents =
-          location === "all"
-            ? events
-            : events.filter((event) => event.location === location);
-        const eventsToShow = locationEvents.slice(0, eventCount);
-        this.setState({
-          events: eventsToShow,
-          seletedLocation: location,
-        });
+  updateEvents = (location, eventCount) => {
+    const { numberOfEvents } = this.state;
+    if (location === undefined) location = this.state.selectedLocation;
+    getEvents().then((events) => {
+      const locationEvents =
+        location === "all"
+          ? events
+          : events.filter((event) => event.location === location);
+      eventCount = eventCount === undefined ? numberOfEvents : eventCount;
+      this.setState({
+        events: locationEvents.slice(0, eventCount),
+        selectedLocation: location,
+        numberOfEvents: eventCount,
       });
-    } else {
-      getEvents().then((events) => {
-        const locationEvents =
-          seletedLocation === "all"
-            ? events
-            : events.filter((event) => event.location === seletedLocation);
-        const eventsToShow = locationEvents.slice(0, inputs);
-        this.setState({
-          events: eventsToShow,
-          eventCount: inputs,
-        });
-      });
-    }
+    });
   };
 
   render() {
@@ -91,8 +74,8 @@ class App extends Component {
           updateEvents={this.updateEvents}
         />
         <NumberOfEvents
-          num={this.state.numberOfEvents}
-          updateNumberOfEvents={(num) => this.updateNumberOfEvents(num)}
+          numberOfEvents={this.state.numberOfEvents}
+          updateEvents={this.updateEvents}
         />
         <EventList events={this.state.events} />
         <WelcomeScreen
