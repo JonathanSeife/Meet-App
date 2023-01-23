@@ -17,6 +17,40 @@ class App extends Component {
     showWelcomeScreen: undefined,
   };
 
+  updateNumberOfEvents(number) {
+    this.setState({
+      numberOfEvents: number,
+    });
+  }
+
+  async componentDidMount() {
+    this.mounted = true;
+    const accessToken = localStorage.getItem("access_token");
+    let goGetEvents;
+    if (navigator.onLine) {
+      const isTokenValid = (await checkToken(accessToken)).error ? false : true;
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
+      this.setState({ showWelcomeScreen: !(code || isTokenValid) });
+      goGetEvents = (code || isTokenValid) && this.mounted;
+    } else {
+      goGetEvents = accessToken && this.mounted;
+      this.setState({ showWelcomeScreen: false });
+    }
+
+    if (goGetEvents) {
+      getEvents().then((events) => {
+        if (this.mounted) {
+          events = events.slice(0, this.state.eventCount);
+          this.setState({ events, locations: extractLocations(events) });
+        }
+      });
+    }
+  }
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
   updateEvents = (location, inputs) => {
     const { eventCount, seletedLocation } = this.state;
     if (location) {
@@ -45,47 +79,6 @@ class App extends Component {
       });
     }
   };
-
-  updateNumberOfEvents(number) {
-    this.setState({
-      numberOfEvents: number,
-    });
-  }
-
-  async componentDidMount() {
-    this.mounted = true;
-    const isLocal =
-      window.location.href.startsWith("http://127.0.0.1") ||
-      window.location.href.startsWith("http://localhost");
-    if (navigator.onLine && !isLocal) {
-      const accessToken = localStorage.getItem("access_token");
-      const isTokenValid = (await checkToken(accessToken)).error ? false : true;
-      const searchParams = new URLSearchParams(window.location.search);
-      const code = searchParams.get("code");
-      this.setState({ showWelcomeScreen: !(code || isTokenValid) });
-      if ((code || isTokenValid) && this.mounted)
-        getEvents().then((events) => {
-          if (this.mounted) {
-            events = events.slice(0, this.state.eventCount);
-            this.setState({ events, locations: extractLocations(events) });
-          }
-        });
-    } else {
-      getEvents().then((events) => {
-        if (this.mounted) {
-          this.setState({
-            showWelcomeScreen: false,
-            events: events.slice(0, this.state.numberOfEvents),
-            locations: extractLocations(events),
-          });
-        }
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
-  }
 
   render() {
     if (this.state.showWelcomeScreen === undefined)
