@@ -14,7 +14,7 @@ export class NumberOfEvents extends Component {
         errorText: "Enter number from 1 to 32",
       });
     } else {
-      this.props.updateEvents(null, value);
+      this.updateEvents(null, value);
       this.setState({
         eventCount: value,
         infoText: "",

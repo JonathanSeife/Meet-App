@@ -6,6 +6,7 @@ import NumberOfEvents from "./NumberOfEvents.js";
 import WelcomeScreen from "./WelcomeScreen";
 import { getEvents, extractLocations, checkToken, getAccessToken } from "./api";
 import "./nprogress.css";
+import { InfoAlert } from "./Alert";
 
 class App extends Component {
   state = {
@@ -17,33 +18,51 @@ class App extends Component {
   };
 
   updateEvents = (location, eventCount) => {
-    const { numberOfEvents } = this.state;
-    if (location === null) location = this.state.selectedLocation;
     getEvents().then((events) => {
       const locationEvents =
         location === "all"
           ? events
           : events.filter((event) => event.location === location);
-      eventCount = eventCount === null ? numberOfEvents : eventCount;
       this.setState({
-        events: locationEvents.slice(0, eventCount),
-        selectedLocation: location,
-        numberOfEvents: eventCount,
+        events: locationEvents.slice(0, this.state.numberOfEvents),
       });
     });
   };
 
+  updateNumberOfEvents(number) {
+    this.setState({
+      numberOfEvents: number,
+    });
+  }
+
   async componentDidMount() {
     this.mounted = true;
-    const accessToken = localStorage.getItem("access_token");
-    const isTokenValid = (await checkToken(accessToken)).error ? false : true;
-    const searchParams = new URLSearchParams(window.location.search);
-    const code = searchParams.get("code");
-    this.setState({ showWelcomeScreen: !(code || isTokenValid) });
-    if ((code || isTokenValid) && this.mounted) {
+    const isLocal =
+      window.location.href.startsWith("http://127.0.0.1") ||
+      window.location.href.startsWith("http://localhost");
+    if (navigator.onLine && !isLocal) {
+      const accessToken = localStorage.getItem("access_token");
+      const isTokenValid = (await checkToken(accessToken)).error ? false : true;
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
+      this.setState({ showWelcomeScreen: !(code || isTokenValid) });
+      if ((code || isTokenValid) && this.mounted)
+        getEvents().then((events) => {
+          if (this.mounted) {
+            this.setState({
+              events: events.slice(0, this.state.numberOfEvents),
+              locations: extractLocations(events),
+            });
+          }
+        });
+    } else {
       getEvents().then((events) => {
         if (this.mounted) {
-          this.setState({ events, locations: extractLocations(events) });
+          this.setState({
+            showWelcomeScreen: false,
+            events: events.slice(0, this.state.numberOfEvents),
+            locations: extractLocations(events),
+          });
         }
       });
     }
@@ -53,21 +72,26 @@ class App extends Component {
     this.mounted = false;
   }
 
-  updateNumberOfEvents = (numberOfEvents) => {
-    this.setState({ numberOfEvents }, this.updateEvents(null, numberOfEvents));
-  };
-
   render() {
     if (this.state.showWelcomeScreen === undefined)
       return <div className="App" />;
 
     return (
       <div className="App">
+        {!navigator.onLine && (
+          <InfoAlert
+            className="alert-info"
+            text="It seems you are currently offline. You are viewing your cached data."
+          />
+        )}
         <CitySearch
           locations={this.state.locations}
           updateEvents={this.updateEvents}
         />
-        <NumberOfEvents updateNumberOfEvents={this.updateNumberOfEvents} />
+        <NumberOfEvents
+          num={this.state.numberOfEvents}
+          updateNumberOfEvents={(num) => this.updateNumberOfEvents(num)}
+        />
         <EventList events={this.state.events} />
         <WelcomeScreen
           showWelcomeScreen={this.state.showWelcomeScreen}
