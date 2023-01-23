@@ -12,7 +12,7 @@ class App extends Component {
   state = {
     events: [],
     locations: [],
-    numberOfEvents: 32,
+    eventCount: 32,
     selectedLocation: "all",
     showWelcomeScreen: undefined,
   };
