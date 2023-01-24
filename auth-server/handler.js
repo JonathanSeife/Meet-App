@@ -1,4 +1,5 @@
 const { google } = require("googleapis");
+const { oauth2 } = require("googleapis/build/src/apis/oauth2");
 const OAuth2 = google.auth.OAuth2;
 const calendar = google.calendar("v3");
 /**
@@ -26,11 +27,7 @@ const credentials = {
   ],
 };
 const { client_secret, client_id, redirect_uris, calendar_id } = credentials;
-const oAuth2Client = new google.auth.OAuth2(
-  client_id,
-  client_secret,
-  redirect_uris[0]
-);
+const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
 
 /**
  *
@@ -63,12 +60,7 @@ module.exports.getAuthURL = async () => {
   };
 };
 module.exports.getAccessToken = async (event) => {
-  // The values used to instantiate the OAuthClient are at the top of the file
-  const oAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0]
-  );
+  const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
   // Decode authorization code extracted from the URL query
   const code = decodeURIComponent(`${event.pathParameters.code}`);
 
@@ -109,12 +101,7 @@ module.exports.getAccessToken = async (event) => {
 };
 
 module.exports.getCalendarEvents = async (event) => {
-  // The values used to instantiate the OAuthClient are at the top of the file
-  const oAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0]
-  );
+  const oAuth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
 
   // Decode and use access token extracted from the URL query
   const access_token = decodeURIComponent(

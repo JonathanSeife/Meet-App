@@ -53,8 +53,8 @@ export const getEvents = async () => {
     NProgress.done();
     return data ? JSON.parse(data).events : [];
   }
-  const token = await getAccessToken();
 
+  const token = await getAccessToken();
   if (token) {
     removeQuery();
     const url =
@@ -75,7 +75,7 @@ export const getEvents = async () => {
 const getToken = async (code) => {
   const encodeCode = encodeURIComponent(code);
   const { access_token } = await fetch(
-    "https://738ojvo7p8.execute-api.us-east-1.amazonaws.com/de/api/get-auth-url" +
+    "https://738ojvo7p8.execute-api.us-east-1.amazonaws.com/de/api/token" +
       "/" +
       encodeCode
   )
@@ -91,6 +91,7 @@ const getToken = async (code) => {
 
 export const getAccessToken = async () => {
   const accessToken = localStorage.getItem("access_token");
+
   const tokenCheck = accessToken && (await checkToken(accessToken));
 
   if (!accessToken || tokenCheck.error) {

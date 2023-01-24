@@ -5,7 +5,7 @@ class CitySearch extends Component {
   state = {
     query: "",
     suggestions: [],
-    showSuggestions: false,
+    showSuggestions: undefined,
     infoText: "",
   };
 
@@ -29,13 +29,14 @@ class CitySearch extends Component {
       });
     }
   };
+
   handleItemClicked = (suggestion) => {
     this.setState({
       query: suggestion,
-      suggestions: [],
       showSuggestions: false,
       infoText: "",
     });
+
     this.props.updateEvents(suggestion);
   };
 
