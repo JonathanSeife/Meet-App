@@ -29,7 +29,7 @@ o.svg"
         </div>
       </div>
       <a
-        href="https://JonathanSeife.github.io/meet/privacy.html"
+        href="https://JonathanSeife.github.io/meet-app/privacy.html"
         rel="nofollow noopener"
       >
         Privacy policy

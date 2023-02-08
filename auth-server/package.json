@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "googleapis": "^59.0.0",
-    "http-server": "^14.1.1"
+    "googleapis": "^59.0.0"
   }
 }
